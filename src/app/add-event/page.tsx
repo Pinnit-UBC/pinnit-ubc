@@ -1,7 +1,7 @@
 import React from "react";
 
-const page = () => {
-  return <div>page</div>;
+const addEventsPage = () => {
+  return <div>Add Events</div>;
 };
 
-export default page;
+export default addEventsPage;
