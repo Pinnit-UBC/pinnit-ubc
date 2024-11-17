@@ -70,3 +70,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.hamburger-menu-item{
+  @apply flex items-center text-lg font-black p-6 justify-center text-center border-b border-b-[#555555];
+}
