@@ -55,7 +55,10 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		spacing: {
+			'1/6': '33.33%'
+		}
   	}
   },
   plugins: [require("tailwindcss-animate")],
