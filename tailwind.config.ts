@@ -58,6 +58,9 @@ const config: Config = {
   		},
 		spacing: {
 			'1/6': '33.33%'
+		},
+		screens: {
+			xs: '480'
 		}
   	}
   },

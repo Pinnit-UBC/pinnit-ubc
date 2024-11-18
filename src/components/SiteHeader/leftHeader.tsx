@@ -36,15 +36,15 @@ export default function LeftHeader() {
             <MenuIcon size={32}/>
             <div ref={hamburgerRef}><HamburgerMenu isHamburgerOpen={isOpen}/></div>
         </div>
-        <Link href="/" className="flex items-center gap-2">
-        <Image
-            src="/public/next.svg"
-            alt="Pinnit Logo"
-            width={32}
-            height={32}
-            className="rounded-full"
-        />
-        <span className="font-sans font-medium text-3xl text-[#FFFFFF]">Pinnit</span>
+        <Link href="/" className="xs:flex items-center gap-1 hidden">
+            <Image
+                src="/public/next.svg"
+                alt="Pinnit Logo"
+                width={32}
+                height={32}
+                className="rounded-full"
+            />
+            <span className="font-sans font-medium text-3xl text-[#FFFFFF]">Pinnit</span>
         </Link>
     </div>
   )
