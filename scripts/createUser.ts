@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import connectMongo from '../lib/db';
-import User from '../models/User';
+import connectMongo from '../src/lib/db'; // Correct path to db.ts
+import User from '../src/models/User'; // Correct path to User model
 
 async function createUser() {
   try {
@@ -9,14 +9,13 @@ async function createUser() {
     const email = 'test@example.com'; // Replace with your desired email
     const plainPassword = 'password123'; // Replace with your desired password
 
-    // Check if the user already exists
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log(`User with email ${email} already exists.`);
+      console.log('User already exists:', existingUser);
       return;
     }
-
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const user = await User.create({ email, password: hashedPassword });
     console.log('User created:', user);

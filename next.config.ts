@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  webpack: (config) => {
+    config.externals = [...(config.externals || []), 'mongoose']; // Exclude mongoose from being bundled
+    return config;
+  },
 };
 
 export default nextConfig;
