@@ -1,37 +1,66 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { setCookie } from 'cookies-next';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import connectMongo from '@/lib/db';
 import User from '@/models/User';
 import Session from '@/models/Session';
-import crypto from 'crypto';
 
-export default async function login(req: NextApiRequest, res: NextApiResponse): Promise<void> {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method Not Allowed' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { email, password } = req.body;
 
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  // Connect to MongoDB
   try {
     await connectMongo();
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    return res.status(500).json({ error: 'Failed to connect to database' });
+  }
 
+  try {
+    // Find user by email
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      res.status(401).json({ error: 'Invalid email or password' });
-      return;
+    if (!user) {
+      console.error('Invalid email:', email);
+      return res.status(401).json({ error: 'Invalid login credentials' });
     }
 
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
+    // Compare password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      console.error('Invalid password for user:', email);
+      return res.status(401).json({ error: 'Invalid login credentials' });
+    }
 
-    await Session.create({ user_id: user._id, session_token: sessionToken, expires_at: expiresAt });
+    // Create session
+    const sessionToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'default_secret', {
+      expiresIn: '1h',
+    });
 
-    setCookie('sessionToken', sessionToken, { req, res, httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 });
-    res.status(200).json({ message: 'Login successful' });
+    await Session.create({
+      session_token: sessionToken,
+      user_id: user._id,
+      expires_at: new Date(Date.now() + 3600 * 1000), // 1 hour
+    });
+
+    // Set cookie
+    res.setHeader(
+      'Set-Cookie',
+      `sessionToken=${sessionToken}; HttpOnly; Path=/; Max-Age=3600`
+    );
+
+    console.log('User logged in successfully:', email);
+    return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error during login:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

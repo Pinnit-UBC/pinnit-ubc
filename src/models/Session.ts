@@ -1,16 +1,20 @@
-import mongoose, { Schema, Document, model, Model } from 'mongoose';
+import { Schema, model, models, Model } from 'mongoose';
 
-export interface ISession extends Document {
-  user_id: mongoose.Types.ObjectId;
+// Define the interface for the session
+interface ISession {
   session_token: string;
+  user_id: string; // or mongoose.Types.ObjectId if you're using ObjectId
   expires_at: Date;
 }
 
-const sessionSchema: Schema<ISession> = new Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+// Define the session schema
+const sessionSchema = new Schema<ISession>({
   session_token: { type: String, required: true },
+  user_id: { type: String, required: true }, // Use String if ObjectId isn't compatible in edge environments
   expires_at: { type: Date, required: true },
 });
 
-const Session: Model<ISession> = mongoose.models.Session || model<ISession>('Session', sessionSchema);
+// Use models.Session if it exists, otherwise define it
+const Session = (models && models.Session) || model<ISession>('Session', sessionSchema);
+
 export default Session;

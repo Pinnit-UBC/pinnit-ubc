@@ -2,6 +2,7 @@
   "name": "pinnit-auth",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -12,12 +13,14 @@
     "autoprefixer": "^10.4.20",
     "bcrypt": "^5.1.1",
     "cookies-next": "^5.0.2",
-    "mongoose": "^8.8.1",
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.8.2",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -25,6 +28,7 @@
     "eslint-config-next": "15.0.3",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

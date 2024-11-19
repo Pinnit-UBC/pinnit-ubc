@@ -1,18 +1,17 @@
-import mongoose, { Schema, Document, model, Model } from 'mongoose';
+import { Schema, model, Model, Document } from 'mongoose';
 
-export interface IUser extends Document {
+// Define the user interface for TypeScript
+interface IUser extends Document {
   email: string;
-  password_hash: string;
-  role: string; // Add role field
-  created_at: Date;
+  password: string;
 }
 
-const userSchema: Schema<IUser> = new Schema({
+// Define the schema
+const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
-  password_hash: { type: String, required: true },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }, // Define role field
-  created_at: { type: Date, default: Date.now },
+  password: { type: String, required: true },
 });
 
-const User: Model<IUser> = mongoose.models.User || model<IUser>('User', userSchema);
+// Export the model
+const User: Model<IUser> = model<IUser>('User', userSchema, 'users'); // 'users' is the collection name
 export default User;
