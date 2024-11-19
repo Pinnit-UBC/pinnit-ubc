@@ -1,31 +1,63 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import connectMongo from '@/lib/db';
 import User from '@/models/User';
+import UserProfile from '@/models/UserProfile';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function register(req: NextApiRequest, res: NextApiResponse): Promise<void> {
+export default async function registerHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method Not Allowed' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, password } = req.body;
+  const {
+    email,
+    password,
+    confirmPassword,
+    firstName,
+    lastName,
+    yearLevel,
+    faculty,
+    eventCategories,
+    preferredEventDays,
+    clubsOrganizations,
+  } = req.body;
+
+  if (!email || !password || !confirmPassword || !firstName || !lastName) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
 
   try {
     await connectMongo();
 
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ error: 'User already exists' });
-      return;
+      return res.status(400).json({ error: 'User already exists' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
-    await User.create({ email, password_hash: passwordHash });
+    // Create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ email, password: hashedPassword });
 
-    res.status(201).json({ message: 'User registered successfully' });
+    // Create user profile
+    const userProfile = await UserProfile.create({
+      userId: user._id,
+      firstName,
+      lastName,
+      yearLevel,
+      faculty,
+      eventCategories,
+      preferredEventDays,
+      clubsOrganizations,
+    });
+
+    res.status(201).json({ message: 'User registered successfully', user, userProfile });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
