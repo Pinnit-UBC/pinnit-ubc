@@ -48,15 +48,17 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
 
     // Create the user profile in the UserProfile collection
     await UserProfile.create({
-      user_id: user._id,
-      first_name,
-      last_name,
-      year_level,
-      faculty,
-      event_interests,
-      preferred_days,
-      clubs,
-    });
+        user_id: user._id,
+        first_name,
+        last_name,
+        year_level,
+        faculty,
+        event_interests,
+        preferred_days,
+        clubs,
+        keywords, // Save keywords here
+      });
+      
 
     // Respond with success
     res.status(201).json({ message: 'User registered successfully' });

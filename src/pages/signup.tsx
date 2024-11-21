@@ -12,10 +12,27 @@ const Register = () => {
     eventCategories: [],
     preferredEventDays: [],
     clubsOrganizations: '',
+    keywords: [] as string[], // Array for selected keywords
   });
 
+  const [searchKeyword, setSearchKeyword] = useState(''); // Searchable text input
+  const [customKeyword, setCustomKeyword] = useState(''); // Custom keyword input
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const popularKeywords = [
+    'Tech',
+    'Basketball',
+    'Painting',
+    'Music',
+    'Coding',
+    'Photography',
+    'Writing',
+    'Dance',
+    'Gaming',
+    'Science',
+    'Math',
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -27,13 +44,33 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [key]: options }));
   };
 
+  const handleAddKeyword = () => {
+    const trimmedKeyword = customKeyword.trim();
+    if (trimmedKeyword && !formData.keywords.includes(trimmedKeyword)) {
+      setFormData((prev) => ({
+        ...prev,
+        keywords: [...prev.keywords, trimmedKeyword],
+      }));
+      setCustomKeyword('');
+    }
+  };
+
+  const handleKeywordSelect = (keyword: string) => {
+    if (!formData.keywords.includes(keyword)) {
+      setFormData((prev) => ({
+        ...prev,
+        keywords: [...prev.keywords, keyword],
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/userRegistration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -60,6 +97,7 @@ const Register = () => {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {success && <p className="text-green-500 mb-4">{success}</p>}
       <form onSubmit={handleSubmit}>
+        {/* First Name */}
         <div className="mb-4">
           <label className="block text-gray-700">First Name</label>
           <input
@@ -72,6 +110,7 @@ const Register = () => {
           />
         </div>
 
+        {/* Last Name */}
         <div className="mb-4">
           <label className="block text-gray-700">Last Name</label>
           <input
@@ -84,6 +123,7 @@ const Register = () => {
           />
         </div>
 
+        {/* Email */}
         <div className="mb-4">
           <label className="block text-gray-700">Email</label>
           <input
@@ -96,6 +136,7 @@ const Register = () => {
           />
         </div>
 
+        {/* Password */}
         <div className="mb-4">
           <label className="block text-gray-700">Password</label>
           <input
@@ -108,6 +149,7 @@ const Register = () => {
           />
         </div>
 
+        {/* Confirm Password */}
         <div className="mb-4">
           <label className="block text-gray-700">Confirm Password</label>
           <input
@@ -120,6 +162,7 @@ const Register = () => {
           />
         </div>
 
+        {/* Year Level */}
         <div className="mb-4">
           <label className="block text-gray-700">Year Level</label>
           <select
@@ -137,6 +180,7 @@ const Register = () => {
           </select>
         </div>
 
+        {/* Faculty */}
         <div className="mb-4">
           <label className="block text-gray-700">Faculty</label>
           <select
@@ -155,50 +199,60 @@ const Register = () => {
           </select>
         </div>
 
+        {/* Keywords Section */}
         <div className="mb-4">
-          <label className="block text-gray-700">Event Categories of Interest</label>
-          <select
-            multiple
-            name="eventCategories"
-            value={formData.eventCategories}
-            onChange={(e) => handleMultiSelectChange(e, 'eventCategories')}
-            className="w-full p-2 border rounded"
-          >
-            <option value="Academic">Academic</option>
-            <option value="Social">Social</option>
-            <option value="Sports">Sports</option>
-            <option value="Cultural">Cultural</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">Preferred Event Days</label>
-          <select
-            multiple
-            name="preferredEventDays"
-            value={formData.preferredEventDays}
-            onChange={(e) => handleMultiSelectChange(e, 'preferredEventDays')}
-            className="w-full p-2 border rounded"
-          >
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">Clubs/Organizations</label>
+          <label className="block text-gray-700">Keywords of Interest</label>
+          {/* Search Bar */}
           <input
             type="text"
-            name="clubsOrganizations"
-            value={formData.clubsOrganizations}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
+            placeholder="Search keywords..."
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            className="w-full p-2 border rounded mb-2"
           />
+          {/* Filtered Keyword List */}
+          <div className="border p-2 rounded h-32 overflow-y-auto">
+            {popularKeywords
+              .filter((keyword) =>
+                keyword.toLowerCase().includes(searchKeyword.toLowerCase())
+              )
+              .map((keyword) => (
+                <div
+                  key={keyword}
+                  className="cursor-pointer p-1 hover:bg-blue-100"
+                  onClick={() => handleKeywordSelect(keyword)}
+                >
+                  {keyword}
+                </div>
+              ))}
+          </div>
+          {/* Add Custom Keyword */}
+          <div className="flex items-center mt-2">
+            <input
+              type="text"
+              placeholder="Add custom keyword..."
+              value={customKeyword}
+              onChange={(e) => setCustomKeyword(e.target.value)}
+              className="w-full p-2 border rounded mr-2"
+            />
+            <button
+              type="button"
+              onClick={handleAddKeyword}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        {/* Selected Keywords */}
+        <div className="mb-4">
+          <label className="block text-gray-700">Selected Keywords</label>
+          <ul className="list-disc pl-5">
+            {formData.keywords.map((keyword, index) => (
+              <li key={index}>{keyword}</li>
+            ))}
+          </ul>
         </div>
 
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
