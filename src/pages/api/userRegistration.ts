@@ -17,17 +17,19 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
     const {
       email,
       password,
-      first_name,
-      last_name,
-      year_level,
+      first_name: firstName,
+      last_name: lastName,
+      username,
+      year_level: yearLevel,
       faculty,
-      event_interests,
-      preferred_days,
-      clubs,
+      keywords, // Extracting selected keywords
     } = req.body;
 
+    // Debugging: log received data
+    console.log('Received form data:', req.body);
+
     // Validate required fields
-    if (!email || !password || !first_name || !last_name) {
+    if (!email || !password || !firstName || !lastName || !username || !yearLevel) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -48,17 +50,14 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
 
     // Create the user profile in the UserProfile collection
     await UserProfile.create({
-        user_id: user._id,
-        first_name,
-        last_name,
-        year_level,
-        faculty,
-        event_interests,
-        preferred_days,
-        clubs,
-        keywords, // Save keywords here
-      });
-      
+      userId: user._id, // Use user._id to link profiles to users
+      firstName,
+      lastName,
+      username,
+      yearLevel,
+      faculty,
+      keywords, // Store keywords as an array
+    });
 
     // Respond with success
     res.status(201).json({ message: 'User registered successfully' });
