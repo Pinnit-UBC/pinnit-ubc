@@ -2,7 +2,9 @@ import AuthPage from "@/components/auth-page";
 import React from "react";
 
 const page = () => {
-  return <AuthPage />;
+  return <div>
+    Ethan test
+  </div>>
 };
 
 export default page;
