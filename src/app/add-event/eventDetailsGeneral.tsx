@@ -22,7 +22,7 @@ export default function EventDetailsGeneral() {
                     />
                     <label
                         htmlFor="event-name-field"
-                        className={`absolute cursor-text bg-white px-1 left-2.5 top-2.5 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/event-name:-top-1.5 peer-focus/event-name:left-2.5 peer-focus/event-name:text-xs peer-focus/event-name:text-slate-400 peer-focus/event-name:scale-90 ${(eventNameValue === '') ? '' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
+                        className={`absolute cursor-text bg-white px-1 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/event-name:-top-1.5 peer-focus/event-name:left-2.5 peer-focus/event-name:text-xs peer-focus/event-name:text-slate-400 peer-focus/event-name:scale-90 ${(eventNameValue === '') ? 'left-2.5 top-2.5' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
                     >
                         Event Name<span className="text-red-400">*</span>
                     </label>
@@ -38,7 +38,7 @@ export default function EventDetailsGeneral() {
                     />
                     <label
                         htmlFor="organization-name-field"
-                        className={`absolute cursor-text bg-white px-1 left-2.5 top-2.5 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/organization-name:-top-1.5 peer-focus/organization-name:left-2.5 peer-focus/organization-name:text-xs peer-focus/organization-name:text-slate-400 peer-focus/organization-name:scale-90 ${(organizationNameValue === '') ? '' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
+                        className={`absolute cursor-text bg-white px-1 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/organization-name:-top-1.5 peer-focus/organization-name:left-2.5 peer-focus/organization-name:text-xs peer-focus/organization-name:text-slate-400 peer-focus/organization-name:scale-90 ${(organizationNameValue === '') ? 'left-2.5 top-2.5' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
                     >
                         Organization Name<span className="text-red-400">*</span>
                     </label>
@@ -53,7 +53,7 @@ export default function EventDetailsGeneral() {
                     />
                     <label
                         htmlFor="event-description-field"
-                        className={`absolute cursor-text bg-white px-1 left-2.5 top-2.5 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/event-description:-top-1.5 peer-focus/event-description:left-2.5 peer-focus/event-description:text-xs peer-focus/event-description:text-slate-400 peer-focus/event-description:scale-90 ${(eventDescriptionValue === '') ? '' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
+                        className={`absolute cursor-text bg-white px-1 text-slate-400 text-sm duration-200 transition-all transform origin-left peer-focus/event-description:-top-1.5 peer-focus/event-description:left-2.5 peer-focus/event-description:text-xs peer-focus/event-description:text-slate-400 peer-focus/event-description:scale-90 ${(eventDescriptionValue === '') ? 'left-2.5 top-2.5' : "-top-1.5 left-2.5 text-xs text-slate-400 scale-90"}`}
                     >
                         Event Description
                     </label>

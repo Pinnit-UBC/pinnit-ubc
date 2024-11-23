@@ -26,9 +26,11 @@ export default function EventForm() {
             <EventDetailsLocation />
         </form>
         <footer className='sticky flex justify-end gap-6 bottom-0 left-0 w-full border-t bg-white text-black p-5 shadow-md'>
-            <button className='rounded-md text-[#556cd6] px-4 py-2 transition duration-200 ease hover:bg-slate-100'>
-                Home
-            </button>
+            <a href='/'>
+                <button className='rounded-md text-[#556cd6] px-4 py-2 transition duration-200 ease hover:bg-slate-100'>
+                    Home
+                </button>
+            </a>
             <button className="bg-[#556cd6] rounded-md text-primary-foreground px-4 py-2 transition duration-200 ease hover:bg-[#3f4b8c]">
                Create Event
             </button>
