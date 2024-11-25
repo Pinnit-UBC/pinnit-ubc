@@ -5,9 +5,10 @@ interface IUser {
   password: string;
 }
 
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  username: { type: String, required: true }, // Add username field
 });
 
 // Use an existing model if it exists, otherwise create a new one

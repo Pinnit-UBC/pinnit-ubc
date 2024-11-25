@@ -8,6 +8,7 @@ interface IUserProfile {
   yearLevel: string; // Dropdown values
   faculty: string; // Dropdown values
   keywords: string[]; // Unified interests and hobbies
+  following: string[]; // Array of followed clubs
 }
 
 const userProfileSchema = new Schema<IUserProfile>({
@@ -18,6 +19,7 @@ const userProfileSchema = new Schema<IUserProfile>({
   yearLevel: { type: String, required: true },
   faculty: { type: String, required: true },
   keywords: [{ type: String, required: true }], // Unified array of strings
+  following: [{ type: String, default: [] }], // Added following as an array with default empty
 });
 
 const UserProfile: Model<IUserProfile> = models.UserProfile || model<IUserProfile>('UserProfile', userProfileSchema);

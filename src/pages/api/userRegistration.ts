@@ -11,7 +11,9 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
 
   try {
     // Connect to MongoDB
+    console.log('Connecting to MongoDB...');
     await connectMongo();
+    console.log('MongoDB connected successfully!');
 
     // Extract data from request body
     const {
@@ -22,10 +24,10 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
       username,
       year_level: yearLevel,
       faculty,
-      keywords, // Extracting selected keywords
+      keywords,
+      following,
     } = req.body;
 
-    // Debugging: log received data
     console.log('Received form data:', req.body);
 
     // Validate required fields
@@ -46,21 +48,25 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
     const user = await User.create({
       email,
       password: hashedPassword,
+      username, // Add username field here
     });
 
     // Create the user profile in the UserProfile collection
-    await UserProfile.create({
-      userId: user._id, // Use user._id to link profiles to users
+    const userProfile = await UserProfile.create({
+      userId: user._id,
       firstName,
       lastName,
       username,
       yearLevel,
       faculty,
-      keywords, // Store keywords as an array
+      keywords,
+      following,
     });
 
+    console.log('UserProfile created:', userProfile);
+
     // Respond with success
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: 'User registered successfully', data: { user, userProfile } });
   } catch (error) {
     console.error('Error registering user:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Register = () => {
   const [step, setStep] = useState(1); // Track the current step
@@ -12,27 +12,37 @@ const Register = () => {
     year_level: '',
     faculty: '',
     keywords: [] as string[],
+    following: [] as string[], // New field to store selected clubs
   });
 
   const [customKeyword, setCustomKeyword] = useState('');
+  const [recommendedClubs, setRecommendedClubs] = useState<[string, number][]>([]); // Club name and match score
+  const [clubsData, setClubsData] = useState<{ [key: string]: string[] }>({}); // Store loaded club data
+  const [keywords, setKeywords] = useState<string[]>([]); // State for keywords loaded dynamically
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const keywords = [
-    'Programming',
-    'Reading',
-    'Languages',
-    'Academia/Research',
-    'Debate',
-    'Tech',
-    'Finance & Banking',
-    'Consulting',
-    'Medical',
-    'Dentistry',
-    'Case Competition',
-    'Cooking',
-    'Hiking',
-  ];
+  // Fetch keywords dynamically from the public folder
+  useEffect(() => {
+    fetch('/data/keywords.json')
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load keywords.json: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => setKeywords(data.keywords))
+      .catch((err) => console.error('Error loading keywords data:', err));
+  }, []);
+
+  // Fetch club data from the public directory
+  useEffect(() => {
+    fetch('/data/clubs.json')
+      .then((res) => res.json())
+      .then((data) => setClubsData(data))
+      .catch((err) => console.error('Error loading clubs data:', err));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -59,6 +69,22 @@ const Register = () => {
     }
   };
 
+  const handleRecommendations = () => {
+    const clubScores: [string, number][] = Object.entries(clubsData).map(
+      ([club, clubKeywords]) => {
+        const matchCount = formData.keywords.filter((keyword) =>
+          clubKeywords.includes(keyword)
+        ).length;
+        return [club, matchCount];
+      }
+    );
+
+    // Sort clubs by match count (descending)
+    const sortedClubs = clubScores.sort((a, b) => b[1] - a[1]);
+
+    setRecommendedClubs(sortedClubs);
+  };
+
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
@@ -83,6 +109,23 @@ const Register = () => {
       setError('Error submitting the form');
       console.error(err);
     }
+  };
+
+  const toggleFollowing = (club: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      following: prev.following.includes(club)
+        ? prev.following.filter((c) => c !== club)
+        : [...prev.following, club],
+    }));
+  };
+
+  const validatePasswords = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match. Please try again.');
+      return false;
+    }
+    return true;
   };
 
   const renderStep = () => {
@@ -220,6 +263,32 @@ const Register = () => {
             </div>
           </>
         );
+      case 4:
+        return (
+          <>
+            <h2 className="text-xl font-bold mb-4">Recommended Clubs and Organizations</h2>
+            {recommendedClubs.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {recommendedClubs.map(([club]) => (
+                  <button
+                    key={club}
+                    type="button"
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      formData.following.includes(club)
+                        ? 'bg-green-500 text-white shadow-md'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                    onClick={() => toggleFollowing(club)}
+                  >
+                    {club}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No recommendations available.</p>
+            )}
+          </>
+        );
       default:
         return null;
     }
@@ -233,8 +302,17 @@ const Register = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (step === 3) handleSubmit();
-          else setStep((prev) => prev + 1);
+          if (step === 1 && !validatePasswords()) {
+            return;
+          }
+          if (step === 3) {
+            handleRecommendations();
+            setStep((prev) => prev + 1);
+          } else if (step === 4) {
+            handleSubmit();
+          } else {
+            setStep((prev) => prev + 1);
+          }
         }}
       >
         {renderStep()}
@@ -252,7 +330,7 @@ const Register = () => {
             type="submit"
             className="bg-blue-500 text-white p-2 rounded"
           >
-            {step === 3 ? 'Register' : 'Continue'}
+            {step === 4 ? 'Register' : 'Continue'}
           </button>
         </div>
       </form>
