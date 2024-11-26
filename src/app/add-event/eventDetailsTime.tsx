@@ -1,8 +1,23 @@
-import React from 'react'
+"use client";
+import React, { useEffect } from 'react'
 
-export default function EventDetailsTime() {
+interface eventDetailsTimeProps {
+    addEventsFormData: FormData
+}
+
+const EventDetailsTime: React.FC<eventDetailsTimeProps> = ({ addEventsFormData }) => {
     var today = new Date();
     var todayFormatedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    useEffect(() => {
+        addEventsFormData.append("eventDate", todayFormatedDate)
+        addEventsFormData.append("eventStartTime", "5:00")
+        addEventsFormData.append("eventEndTime", "9:00")
+    }, [])
+    
+    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
+        addEventsFormData.set(event.target.name, event.target.value)
+    }
     
   return (
     <div className='w-full flex flex-col py-5'>
@@ -12,6 +27,9 @@ export default function EventDetailsTime() {
             <input
                 id="date-field"
                 type='date'
+                required
+                name="eventDate"
+                onChange={(e) => {updateAddEventsFormData(e)}}
                 defaultValue={todayFormatedDate}
                 className="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
             />
@@ -26,6 +44,9 @@ export default function EventDetailsTime() {
             <div className="relative flex w-1/2">
                 <input
                     type='time'
+                    required
+                    name="eventStartTime"
+                    onChange={(e) => { updateAddEventsFormData(e)} }
                     defaultValue="17:00"
                     className="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
                 />
@@ -39,6 +60,9 @@ export default function EventDetailsTime() {
             <div className="relative flex w-1/2">
                 <input
                     type='time'
+                    required
+                    name="eventEndTime"
+                    onChange={(e) => { updateAddEventsFormData(e) }}
                     defaultValue="21:00"
                     className="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
                 />
@@ -55,3 +79,5 @@ export default function EventDetailsTime() {
 </div>
   )
 }
+
+export default EventDetailsTime;

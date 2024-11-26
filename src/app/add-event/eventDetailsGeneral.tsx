@@ -1,10 +1,18 @@
 "use client"
 import React, {useState} from 'react'
 
-export default function EventDetailsGeneral() {
+interface eventDetailsGeneralProps {
+    addEventsFormData: FormData
+}
+
+const EventDetailsGeneral: React.FC<eventDetailsGeneralProps> = ({ addEventsFormData }) => {
     const [eventNameValue, setEventNameValue] = useState('')
     const [organizationNameValue, setOrganizationNameValue] = useState<string>('')
     const [eventDescriptionValue, setEventDescriptionValue] = useState<string>('')
+
+    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
+        addEventsFormData.set(event.target.name, event.target.value)
+    }
     
   return (
     <div>
@@ -17,7 +25,11 @@ export default function EventDetailsGeneral() {
                     <input
                         id="event-name-field"
                         required
-                        onChange={(e) => { setEventNameValue(e.target.value) }}
+                        name="eventName"
+                        onChange={(e) => { 
+                            updateAddEventsFormData(e) 
+                            setEventNameValue(e.target.value)
+                        }}
                         className="peer/event-name w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
                     />
                     <label
@@ -33,7 +45,11 @@ export default function EventDetailsGeneral() {
                     <input
                         id="organization-name-field"
                         required
-                        onChange={(e) => { setOrganizationNameValue(e.target.value) }}
+                        name="organizationName"
+                        onChange={(e) => { 
+                            updateAddEventsFormData(e) 
+                            setOrganizationNameValue(e.target.value)
+                        }}
                         className="peer/organization-name w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
                     />
                     <label
@@ -48,7 +64,11 @@ export default function EventDetailsGeneral() {
                 <div className="relative">
                     <textarea
                         id="event-description-field"
-                        onChange={(e) => { setEventDescriptionValue(e.target.value) }}
+                        name="eventDescription"
+                        onChange={(e) => { 
+                            updateAddEventsFormData(e) 
+                            setEventDescriptionValue(e.target.value)
+                        }}
                         className="peer/event-description resize-none w-full h-24 bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
                     />
                     <label
@@ -62,3 +82,5 @@ export default function EventDetailsGeneral() {
     </div>
   )
 }
+
+export default EventDetailsGeneral;
