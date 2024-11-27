@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 
 interface eventDetailsTimeProps {
     addEventsFormData: FormData
@@ -21,7 +21,7 @@ const EventDetailsTime: React.FC<eventDetailsTimeProps> = ({ addEventsFormData }
     
   return (
     <div className='w-full flex flex-col py-5'>
-    <h1 className='text-2xl font-bold py-0.5'>When does your event start and end?</h1>
+    <h1 className='text-2xl font-semibold font-inter py-0.5'>When does your event start and end?</h1>
     <div className="flex cursor-text float-left py-2">
         <div className="relative flex w-1/2 pr-2">
             <input

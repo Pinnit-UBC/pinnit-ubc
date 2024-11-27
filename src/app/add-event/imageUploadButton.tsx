@@ -1,6 +1,6 @@
-"use client"
-import React, { useState, useRef } from 'react'
-import { Upload, X, FileText } from "lucide-react"
+"use client";
+import React, { useState, useRef } from 'react';
+import { Upload, X, FileText } from "lucide-react";
 
 interface imageUploadProps {
     addEventsFormData: FormData;
@@ -41,8 +41,8 @@ const ImageUploadButton: React.FC<imageUploadProps> = ({ addEventsFormData }) =>
             />
             <div className='w-full flex justify-between pb-12 pt-4 gap-8'>
                 <div className='flex flex-col'>
-                    <h1 className='text-xl font-semibold'>Upload event poster<span></span></h1>
-                    <p className='text-xs font-medium py-0.5'>Accepted file types: .pdf,  .png, .xyz</p>
+                    <h1 className='text-xl font-semibold font-inter'>Upload event poster<span></span></h1>
+                    <p className='text-xs font-medium py-0.5 font-inter'>Accepted file types: .pdf,  .png, .xyz</p>
                 </div>
                 <div className=''>
                     {(eventPoster == null) ?
@@ -50,7 +50,7 @@ const ImageUploadButton: React.FC<imageUploadProps> = ({ addEventsFormData }) =>
                             onClick={(e) => handleEventImageUpload(e)}
                             className='flex items-center justify-content bg-[#556cd6] h-full w-full rounded-md text-primary-foreground p-2 transition duration-200 ease hover:bg-[#3f4b8c]'
                         >
-                            <Upload /> <span className='pl-3'>Upload Poster</span>
+                            <Upload /> <span className='pl-3 font-inter'>Upload Poster</span>
                         </button>
                         :
                         <div className='flex rounded-md border border-[#556cd6] text-primary-foreground p-2 justify-content items-center hover:text-red-500'>
