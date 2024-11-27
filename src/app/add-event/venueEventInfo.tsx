@@ -101,7 +101,7 @@ const VenueEventInfo: React.FC<venueEventInfoProps> = ({ isEventLocationOnline, 
                         ref={locationRef}
                     />
                 </Autocomplete>
-                <span className='text-xs font-medium py-0.5'>Start typing your location, select it from the dropdown menu and we will Pinnit for you!</span>
+                <span className='text-xs font-medium font-inter py-0.5'>Start typing your location, select it from the dropdown menu and we will Pinnit for you!</span>
             </div>
             {(isLoaded) ?
                 <GoogleMap

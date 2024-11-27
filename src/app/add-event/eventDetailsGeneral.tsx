@@ -1,5 +1,5 @@
-"use client"
-import React, {useState} from 'react'
+"use client";
+import React, {useState} from 'react';
 
 interface eventDetailsGeneralProps {
     addEventsFormData: FormData
@@ -17,8 +17,8 @@ const EventDetailsGeneral: React.FC<eventDetailsGeneralProps> = ({ addEventsForm
   return (
     <div>
         <div className='w-full flex flex-col pb-5'>
-                <h1 className='text-2xl font-bold py-0.5'>What is the name of your event?</h1>
-                <p className='text-xs font-medium py-0.5'>Enter the name of your event, your organizations name and a quick description here. This information will be used as the headline to get students attention -- make sure it stands out!</p>
+                <h1 className='text-2xl font-semibold font-inter py-0.5'>What is the name of your event?</h1>
+                <p className='text-xs font-inter py-0.5'>Enter the name of your event, your organizations name and a quick description here. This information will be used as the headline to get students attention -- make sure it stands out!</p>
             </div>
             <div className="w-full py-2">
                 <div className="relative">

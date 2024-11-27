@@ -16,6 +16,7 @@ const PinnitEventSchema = new mongoose.Schema({
     eventImageString: String,
 })
 
-const PinnitEvent = mongoose.model("events", PinnitEventSchema)
+const PinnitEvent = mongoose.models.events || mongoose.model("events", PinnitEventSchema) 
 
-module.exports = PinnitEvent
+
+module.exports = PinnitEvent;
