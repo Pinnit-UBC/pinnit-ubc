@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import EventDetailsGeneral from './eventDetailsGeneral';
 import EventDetailsTime from './eventDetailsTime';
 import EventDetailsLocation from './eventDetailsLocation';
@@ -23,10 +24,10 @@ export default function EventForm() {
         addEventsFormData.append("venueLocationDescription", "")
     }, [])
 
-    const handleAddEventFormSubmit = async (e) => {
+    const handleAddEventFormSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         const addEventJSON: Record<string, string | number> = {}
-        for (let pair of addEventsFormData.entries()) {
+        for (const pair of addEventsFormData.entries()) {
             addEventJSON[pair[0] as string] = pair[1] as string | number;
         }
 
@@ -64,11 +65,11 @@ export default function EventForm() {
                 <ImageUploadButton addEventsFormData={addEventsFormData} />
             </form>
             <footer className='sticky flex justify-end gap-6 bottom-0 left-0 w-full border-t bg-white text-black p-5 shadow-md'>
-                <a href='/'>
+                <Link href='/'>
                     <button className='rounded-md text-[#556cd6] font-inter px-4 py-2 transition duration-200 ease hover:bg-slate-100'>
                         Home
                     </button>
-                </a>
+                </Link>
                 <button
                     className="bg-[#556cd6] rounded-md font-inter text-primary-foreground px-4 py-2 transition duration-200 ease hover:bg-[#3f4b8c]"
                     form="add-event-form"

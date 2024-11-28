@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const PinnitEventSchema = new mongoose.Schema({
     eventName: String,
     organizationName: String,
     eventDescription: String,
-    eventDate: String,
+    eventDate: Date,
     eventStartTime: String,
     eventEndTime: String,
     onlineEventLink: String,
@@ -19,4 +19,4 @@ const PinnitEventSchema = new mongoose.Schema({
 const PinnitEvent = mongoose.models.events || mongoose.model("events", PinnitEventSchema) 
 
 
-module.exports = PinnitEvent;
+export default PinnitEvent;

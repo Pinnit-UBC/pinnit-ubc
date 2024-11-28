@@ -1,24 +1,18 @@
 import { NextResponse } from "next/server";
-const mongoose = require("mongoose");
-const PinnitEvent = require('../../models/pinnitEvent');
+import PinnitEvent from "../../models/pinnitEvent";
+import pinnitDBConnection from '../../utils/db';
 
-const username = "admin";
-const password = "pinnitadmin123"
-const db = "pinnitDb";
-const cluster = "cluster0"
-
-const URI = `mongodb+srv://${username}:${password}@${cluster}.dvqbjnc.mongodb.net/${db}?retryWrites=true&w=majority&appName=Cluster0`
-
-mongoose.connect(URI)
-    .then(() => { console.log("Connected to pinnitDb") })
-    .catch(() => { console.log("Can't connect to pinnitdB") })
+await pinnitDBConnection()
 
 export async function POST(req: Request) {
   try {
     const JSONPinnitEvent = await req.json()
-    console.log(JSONPinnitEvent)
-
     const pinnitEventToAdd = new PinnitEvent(JSONPinnitEvent)
+    console.log(pinnitEventToAdd)
+
+    pinnitEventToAdd.eventDate = new Date(pinnitEventToAdd.eventDate)
+    pinnitEventToAdd.venueLat = Number(pinnitEventToAdd.venueLat)
+    pinnitEventToAdd.venueLng = Number(pinnitEventToAdd.venueLng)
     await pinnitEventToAdd.save();
 
     return NextResponse.json(
@@ -30,7 +24,7 @@ export async function POST(req: Request) {
   } catch (err) {
     return NextResponse.json(
       {
-      message: "Error adding event"
+      message: err
     }
   )
   }

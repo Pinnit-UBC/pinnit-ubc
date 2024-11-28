@@ -10,7 +10,7 @@ const EventDetailsGeneral: React.FC<eventDetailsGeneralProps> = ({ addEventsForm
     const [organizationNameValue, setOrganizationNameValue] = useState<string>('')
     const [eventDescriptionValue, setEventDescriptionValue] = useState<string>('')
 
-    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
         addEventsFormData.set(event.target.name, event.target.value)
     }
     
