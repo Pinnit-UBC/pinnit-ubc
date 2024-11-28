@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			inter: ['Inter', "Sans-serif"],
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

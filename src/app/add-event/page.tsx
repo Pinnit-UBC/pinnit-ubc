@@ -1,14 +1,10 @@
 import React from "react";
+import EventForm from "./eventForm";
 
 export default function addEventsPage() {
   return (
-    <div>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem
-        nihil eum sunt eius, similique natus dolor, provident quos quae sequi
-        modi ipsum dignissimos temporibus cum voluptas optio ad eveniet
-        necessitatibus?
-      </p>
+    <div className="flex flex-col w-full bg-[url('/Images/addEventsBackground.png')] bg-cover bg-center">
+      <EventForm />
     </div>
   );
 }
