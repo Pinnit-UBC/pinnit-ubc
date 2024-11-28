@@ -13,24 +13,24 @@ interface venueEventInfoProps {
 
 const VenueEventInfo: React.FC<venueEventInfoProps> = ({ isEventLocationOnline, addEventsFormData }) => {
     const [locationPosition, setLocationPosition] = useState<locationLatLon>({ lat: 49.2606, lng: -123.2460 })
-    const [venueLocationName, setVenueLocationName] = useState<String>('')
-    const [eventLocationDescription, setEventLocationDescription] = useState<String>('')
+    const [venueLocationName, setVenueLocationName] = useState<string>('')
+    const [eventLocationDescription, setEventLocationDescription] = useState<string>('')
     const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null)
     const locationRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         addEventsFormData.append("venueAddress", "Vancouver, BC V6T 1Z4")
-        addEventsFormData.append("venueLat",  49.2606)
-        addEventsFormData.append("venueLng",  -123.2460)
+        addEventsFormData.append("venueLat",  "49.2606")
+        addEventsFormData.append("venueLng",  "-123.2460")
     }, [])
 
 
     const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY,
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "",
         libraries: ["places"]
     })
 
-    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
         addEventsFormData.set(event.target.name, event.target.value)
     }
 
@@ -40,9 +40,9 @@ const VenueEventInfo: React.FC<venueEventInfoProps> = ({ isEventLocationOnline, 
 
             if (place.geometry && place.geometry.location) {
                 setLocationPosition({ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() })
-                addEventsFormData.set("venueAddress", place.formatted_address)
-                addEventsFormData.set("venueLat",  place.geometry.location.lat())
-                addEventsFormData.set("venueLng",  place.geometry.location.lng())
+                addEventsFormData.set("venueAddress", String(place.formatted_address))
+                addEventsFormData.set("venueLat",  String(place.geometry.location.lat()))
+                addEventsFormData.set("venueLng",  String(place.geometry.location.lng()))
             } else {
                 console.error("Place geometry is not available.");
             }

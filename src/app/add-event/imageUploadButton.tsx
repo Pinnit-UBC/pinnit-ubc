@@ -10,10 +10,10 @@ const ImageUploadButton: React.FC<imageUploadProps> = ({ addEventsFormData }) =>
     const [eventPoster, setEventPoster] = useState<File | null>(null);
     const eventImageUploadRef = useRef<HTMLInputElement | null>(null);
 
-    const handleEventImageUpload = (e) => {
+    const handleEventImageUpload = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        if (eventImageUploadRef !== null) {
-            eventImageUploadRef!.current.click();
+        if (eventImageUploadRef.current !== null) {
+            eventImageUploadRef.current.click();
         }
     }
 

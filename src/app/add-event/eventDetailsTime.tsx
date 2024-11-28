@@ -6,14 +6,14 @@ interface eventDetailsTimeProps {
 }
 
 const EventDetailsTime: React.FC<eventDetailsTimeProps> = ({ addEventsFormData }) => {
-    var today = new Date();
-    var todayFormatedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const today = new Date();
+    const todayFormatedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
     useEffect(() => {
         addEventsFormData.append("eventDate", todayFormatedDate)
         addEventsFormData.append("eventStartTime", "5:00")
         addEventsFormData.append("eventEndTime", "9:00")
-    }, [])
+    }, [addEventsFormData])
     
     const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
         addEventsFormData.set(event.target.name, event.target.value)
