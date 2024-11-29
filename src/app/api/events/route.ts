@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const pinnitEventToAdd = new PinnitEvent(JSONPinnitEvent)
     console.log(pinnitEventToAdd)
 
-    pinnitEventToAdd.eventDate = new Date(pinnitEventToAdd.eventDate)
+    pinnitEventToAdd.eventDate = new Date(`${pinnitEventToAdd.eventDate}T00:00:00`)
     pinnitEventToAdd.venueLat = Number(pinnitEventToAdd.venueLat)
     pinnitEventToAdd.venueLng = Number(pinnitEventToAdd.venueLng)
     await pinnitEventToAdd.save();

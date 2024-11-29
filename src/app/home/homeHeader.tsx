@@ -17,6 +17,7 @@ export default function HomeHeader() {
                     />
                     <span className="text-3xl text-[#000000] font-inter">Pinnit</span>
                 </Link>
+                
                 <Link 
                     href="/"
                     className="rounded-md flex items-center justify-content gap-2 text-[#000000] font-inter px-3 my-2 transition duration-200 ease hover:bg-slate-100"
