@@ -1,17 +1,20 @@
-import { Schema, model, models, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
-interface IUser {
+// Define the interface for a user
+export interface IUser extends Document {
   email: string;
   password: string;
+  isVerified: boolean;
 }
 
-const userSchema = new Schema({
+// Define the user schema
+const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  username: { type: String, required: true }, // Add username field
+  isVerified: { type: Boolean, default: false },
 });
 
-// Use an existing model if it exists, otherwise create a new one
-const User: Model<IUser> = models.User || model<IUser>('User', userSchema);
+// Define the user model
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
-export default User;
+export default User; // Default export the model
