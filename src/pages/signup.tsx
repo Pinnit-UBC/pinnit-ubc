@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
-const Register = () => {
-  const [step, setStep] = useState(1); // Track the current step
-  const [formData, setFormData] = useState({
+// TypeScript interfaces
+interface FormData {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  year_level: string;
+  faculty: string;
+  keywords: string[];
+  following: string[];
+}
+
+interface ClubsData {
+  [key: string]: string[];
+}
+
+const Register: React.FC = () => {
+  const [step, setStep] = useState<number>(1); // Track the current step
+  const [formData, setFormData] = useState<FormData>({
     first_name: '',
     last_name: '',
     username: '',
@@ -11,17 +29,17 @@ const Register = () => {
     confirmPassword: '',
     year_level: '',
     faculty: '',
-    keywords: [] as string[],
-    following: [] as string[], // New field to store selected clubs
+    keywords: [],
+    following: [],
   });
 
-  const [customKeyword, setCustomKeyword] = useState('');
+  const [customKeyword, setCustomKeyword] = useState<string>('');
   const [recommendedClubs, setRecommendedClubs] = useState<[string, number][]>([]); // Club name and match score
-  const [clubsData, setClubsData] = useState<{ [key: string]: string[] }>({}); // Store loaded club data
-  const [keywords, setKeywords] = useState<string[]>([]); // State for keywords loaded dynamically
+  const [clubsData, setClubsData] = useState<ClubsData>({});
+  const [keywords, setKeywords] = useState<string[]>([]);
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
   // Fetch keywords dynamically from the public folder
   useEffect(() => {
@@ -49,7 +67,7 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleToggleSelect = (key: keyof typeof formData, value: string) => {
+  const handleToggleSelect = (key: 'keywords' | 'following', value: string) => {
     setFormData((prev) => ({
       ...prev,
       [key]: prev[key].includes(value)
@@ -112,12 +130,7 @@ const Register = () => {
   };
 
   const toggleFollowing = (club: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      following: prev.following.includes(club)
-        ? prev.following.filter((c) => c !== club)
-        : [...prev.following, club],
-    }));
+    handleToggleSelect('following', club);
   };
 
   const validatePasswords = () => {
@@ -125,6 +138,7 @@ const Register = () => {
       setError('Passwords do not match. Please try again.');
       return false;
     }
+    setError(''); // Clear error if passwords match
     return true;
   };
 
