@@ -1,7 +1,11 @@
 "use client";
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 
-export const DatePicker = () => {
+interface DatePickerProps {
+    setDateSearched: Dispatch<SetStateAction<String>>
+}
+
+const DatePicker: React.FC<DatePickerProps> = ({setDateSearched}) => {
     const [searchDate, setSearchDate] = useState<String>("")
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     const monthsOfYear = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
@@ -16,9 +20,10 @@ export const DatePicker = () => {
             const searchDateMonth = monthsOfYear[dateTypeSearchDate.getMonth()]
             const searchDateDay = String(dateTypeSearchDate.getDate())
             const searchDateYear = String(dateTypeSearchDate.getFullYear())
-
             setSearchDate(`${searchDateDayName} ${searchDateMonth} ${searchDateDay} ${searchDateYear}`)
         }
+
+        setDateSearched(e.target.value)
 
     }
 
@@ -39,3 +44,5 @@ export const DatePicker = () => {
         </div>
     )
 }
+
+export default DatePicker;
