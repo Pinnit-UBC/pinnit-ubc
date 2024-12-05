@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Image from "next/image";
 
 
@@ -100,4 +101,11 @@ export default function Home() {
       </footer>
     </div>
   );
+=======
+import { HalloweenEvents } from "@/components/halloween-events";
+import Image from "next/image";
+
+export default function Home() {
+  return <HalloweenEvents />;
+>>>>>>> pinnit-ubc/auth
 }
