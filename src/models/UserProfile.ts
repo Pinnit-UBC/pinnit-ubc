@@ -4,11 +4,11 @@ interface IUserProfile {
   userId: Schema.Types.ObjectId; // Reference to the User collection
   firstName: string;
   lastName: string;
-  username: string; // Added username field
-  yearLevel: string; // Dropdown values
-  faculty: string; // Dropdown values
-  keywords: string[]; // Unified interests and hobbies
-  following: string[]; // Array of followed clubs
+  username: string;
+  yearLevel: string;
+  faculty: string;
+  keywords: string[];
+  following: string[];
 }
 
 const userProfileSchema = new Schema<IUserProfile>({
@@ -18,8 +18,8 @@ const userProfileSchema = new Schema<IUserProfile>({
   username: { type: String, required: true },
   yearLevel: { type: String, required: true },
   faculty: { type: String, required: true },
-  keywords: [{ type: String, required: true }], // Unified array of strings
-  following: [{ type: String, default: [] }], // Added following as an array with default empty
+  keywords: [{ type: String, required: true }],
+  following: [{ type: String, default: [] }],
 });
 
 const UserProfile: Model<IUserProfile> = models.UserProfile || model<IUserProfile>('UserProfile', userProfileSchema);

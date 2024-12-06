@@ -3,49 +3,56 @@ import { useRouter } from 'next/router';
 
 const Profile = () => {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  // Fetch the user profile
   useEffect(() => {
-    const checkAuth = async () => {
+    const fetchProfileData = async () => {
       try {
-        const res = await fetch('/api/validateSession', {
-          credentials: 'include',
-        });
+        const res = await fetch('/api/profile', { credentials: 'include' }); // Send cookies
 
-        if (res.ok) {
-          const data = await res.json();
-          setIsAuthenticated(true);
-          setProfileData(data.user); // Assuming user info is returned here
-        } else {
-          setIsAuthenticated(false);
-          router.replace('/login');
+        if (!res.ok) {
+          throw new Error('Failed to fetch profile data');
         }
+
+        const data = await res.json();
+        setProfileData(data);
       } catch (err) {
-        console.error('Auth check failed:', err);
-        setIsAuthenticated(false);
-        router.replace('/login');
+        console.error('Error fetching profile data:', err);
+        setError('Could not load profile information. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
-  }, [router]);
+    fetchProfileData();
+  }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (!isAuthenticated) return null;
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  if (!profileData) {
+    return <p>No profile data found.</p>;
+  }
+
+  // Render the user profile
   return (
     <div>
       <h1>Welcome to your Profile</h1>
-      {profileData && (
-        <div>
-          <p>Name: {profileData.firstName} {profileData.lastName}</p>
-          <p>Email: {profileData.email}</p>
-        </div>
-      )}
+      <p><strong>Name:</strong> {profileData.firstName} {profileData.lastName}</p>
+      <p><strong>Username:</strong> {profileData.username}</p>
+      <p><strong>Email:</strong> {profileData.email}</p>
+      <p><strong>Year Level:</strong> {profileData.yearLevel}</p>
+      <p><strong>Faculty:</strong> {profileData.faculty}</p>
+      <p><strong>Keywords:</strong> {profileData.keywords.join(', ')}</p>
+      <p><strong>Following:</strong> {profileData.following.join(', ')}</p>
     </div>
   );
 };
