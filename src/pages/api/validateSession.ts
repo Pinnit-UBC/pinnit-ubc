@@ -1,25 +1,28 @@
+import { NextApiRequest, NextApiResponse } from 'next';
+import jwt from 'jsonwebtoken';
 import connectMongo from '@/lib/db';
-import Session from '@/models/Session';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import User from '@/models/User';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const sessionToken = req.cookies.sessionToken;
+
+  if (!sessionToken) {
+    return res.status(401).json({ message: 'No session token provided' });
+  }
+
   try {
-    await connectMongo();
-    const sessionToken = req.headers.authorization?.split(' ')[1]; // Extract Bearer token
+    const decoded = jwt.verify(sessionToken, process.env.JWT_SECRET!);
+    await connectMongo(); // Ensure DB connection
 
-    if (!sessionToken) {
-      return res.status(401).json({ error: 'Session token missing' });
+    const user = await User.findById((decoded as any).userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const session = await Session.findOne({ session_token: sessionToken });
-
-    if (!session || new Date() > new Date(session.expires_at)) {
-      return res.status(401).json({ error: 'Invalid or expired session' });
-    }
-
-    return res.status(200).json({ message: 'Session valid' });
+    return res.status(200).json({ message: 'Session valid', user });
   } catch (error) {
-    console.error('Error validating session:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Session validation error:', error);
+    return res.status(401).json({ message: 'Invalid or expired session token' });
   }
 }
