@@ -8,7 +8,7 @@ const Profile = () => {
     keywords: [],
     following: [],
   });
-  const [loading, setLoading] = useState(true); // Loading state for profile data
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   // Check authentication status
@@ -16,21 +16,17 @@ const Profile = () => {
     const checkAuth = async () => {
       try {
         const res = await fetch('/api/authenticate', {
-          credentials: 'include', // Ensure cookies are sent
+          credentials: 'include',
         });
 
         if (!res.ok) {
-          console.log('Not authenticated, redirecting...');
           setIsAuthenticated(false);
           router.push('/login');
           return;
         }
 
-        const data = await res.json();
-        console.log('Authenticated:', data);
         setIsAuthenticated(true);
       } catch (err) {
-        console.error('Authentication error:', err);
         setIsAuthenticated(false);
         router.push('/login');
       }
@@ -41,11 +37,11 @@ const Profile = () => {
 
   // Fetch profile data if authenticated
   useEffect(() => {
-    if (isAuthenticated === true) {
+    if (isAuthenticated) {
       const fetchProfileData = async () => {
         try {
           const res = await fetch('/api/profile', {
-            credentials: 'include', // Ensure cookies are sent
+            credentials: 'include',
           });
 
           if (!res.ok) {
@@ -55,7 +51,6 @@ const Profile = () => {
           const data = await res.json();
           setProfileData(data);
         } catch (err) {
-          console.error('Profile data fetch error:', err);
           setError('Failed to load profile data');
         } finally {
           setLoading(false);
@@ -70,10 +65,8 @@ const Profile = () => {
     try {
       const res = await fetch('/api/profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Ensure cookies are sent
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(profileData),
       });
 
@@ -85,27 +78,25 @@ const Profile = () => {
       setProfileData(updatedData);
       alert('Profile updated successfully!');
     } catch (err) {
-      console.error('Profile update error:', err);
       setError('Failed to update profile');
     }
   };
 
-  // Handle unauthenticated state
   if (isAuthenticated === false) {
     return null; // Avoid rendering anything before redirect
   }
 
   if (loading) {
-    return <p>Loading...</p>; // Show loading state
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>; // Show error message if any
+    return <p>{error}</p>;
   }
 
   return (
     <div>
-      <h1>Profile</h1>
+      <h1>Your Profile</h1>
       <div>
         <label>Keywords:</label>
         <textarea

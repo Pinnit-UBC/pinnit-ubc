@@ -20,5 +20,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/protected/:path*'], // Apply middleware to /protected routes
+  matcher: ['/protected/:path*', '/profile'], // Apply middleware to /protected routes and /profile
 };
