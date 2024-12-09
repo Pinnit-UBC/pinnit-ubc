@@ -12,18 +12,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectMongo();
 
+    // Find user by verification token
     const user = await User.findOne({ verificationToken: token });
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
+    // Mark user as verified
     user.isVerified = true;
-    user.verificationToken = undefined;
+    user.verificationToken = undefined; // Clear the token
     await user.save();
 
-    res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
+    // Redirect to login page with success message
+    return res.redirect(302, '/login?verified=true');
   } catch (error) {
     console.error('Error in email verification:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }

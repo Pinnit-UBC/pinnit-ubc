@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.verified === 'true') {
+      setSuccessMessage('Email successfully verified! You can now log in.');
+    }
+  }, [router.query]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,15 +27,12 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        if (data.message === 'Email not verified') {
-          return setError('Please verify your email before logging in.');
-        }
-        throw new Error(data.error || 'Failed to log in');
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to log in');
       }
 
+      // If login is successful, redirect to profile
       router.push('/profile');
     } catch (err: any) {
       console.error('Login error:', err.message);
@@ -39,6 +43,7 @@ const Login = () => {
   return (
     <div>
       <h1>Login</h1>
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
       <form onSubmit={handleLogin}>
         <div>
           <label>Email:</label>
