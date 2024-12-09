@@ -106,28 +106,26 @@ const Register: React.FC = () => {
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
-
+  
     try {
       const response = await fetch('/api/userRegistration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || 'Something went wrong');
         return;
       }
-
-      const data = await response.json();
-      setSuccess('User registered successfully');
-      console.log('Registration successful:', data);
+  
+      setSuccess('Signup successful! Please check your email to verify your account.');
     } catch (err) {
       setError('Error submitting the form');
-      console.error(err);
     }
   };
+  
 
   const toggleFollowing = (club: string) => {
     handleToggleSelect('following', club);
