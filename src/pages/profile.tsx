@@ -149,7 +149,12 @@ const Profile = () => {
     return (
       <div key={field}>
         <strong>{label}:</strong> {isArray ? value.join(', ') : value}
-        <button onClick={() => { setEditingField(field); setTempValue(value); }}>
+        <button
+          onClick={() => {
+            setEditingField(field);
+            setTempValue(value);
+          }}
+        >
           ✏️ Edit
         </button>
       </div>
@@ -159,12 +164,11 @@ const Profile = () => {
   return (
     <div>
       <h1>Welcome to your Profile</h1>
-      <p>
-        <strong>Name:</strong> {profileData.firstName} {profileData.lastName}
-      </p>
-      <p>
-        <strong>Email:</strong> {profileData.email}
-      </p>
+      {/* Editable Name */}
+      {renderField('First Name', 'firstName')}
+      {renderField('Last Name', 'lastName')}
+      {/* Editable Email */}
+      {renderField('Email', 'email')}
       {/* Editable fields */}
       {renderField('Username', 'username')}
       {renderField('Year Level', 'yearLevel')}

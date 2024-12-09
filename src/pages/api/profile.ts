@@ -46,7 +46,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       return res.status(200).json(response);
+    } else if (req.method === 'PUT') {
+      const { firstName, lastName, email, ...updateData } = req.body;
+
+      // Update UserProfile fields
+      const userProfileUpdate = await UserProfile.findOneAndUpdate(
+        { userId },
+        { $set: { ...updateData, firstName, lastName } },
+        { new: true }
+      );
+
+      // Update email in User collection
+      if (email) {
+        const userUpdate = await User.findByIdAndUpdate(
+          userId,
+          { $set: { email } },
+          { new: true }
+        );
+
+        if (!userUpdate) {
+          return res.status(404).json({ message: 'Failed to update email in user collection.' });
+        }
+      }
+
+      if (!userProfileUpdate) {
+        return res.status(404).json({ message: 'User profile not found.' });
+      }
+
+      return res.status(200).json(userProfileUpdate);
     } else if (req.method === 'POST') {
+      // Handle profile picture upload
       const { file } = req.body;
 
       if (!file) {
@@ -74,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const updatedProfile = await UserProfile.findOneAndUpdate(
         { userId },
         { $set: { profilePicture: cloudfrontUrl } },
-        { new: true, strict: false } // Ensure `profilePicture` is updated
+        { new: true }
       );
 
       if (!updatedProfile) {
