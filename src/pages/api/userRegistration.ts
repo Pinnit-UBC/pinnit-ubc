@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import connectMongo from '@/lib/db';
 import User from '@/models/User';
 import UserProfile from '@/models/UserProfile';
@@ -10,12 +12,8 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
   }
 
   try {
-    // Connect to MongoDB
-    console.log('Connecting to MongoDB...');
     await connectMongo();
-    console.log('MongoDB connected successfully!');
 
-    // Extract data from request body
     const {
       email,
       password,
@@ -28,31 +26,26 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
       following,
     } = req.body;
 
-    console.log('Received form data:', req.body);
-
-    // Validate required fields
     if (!email || !password || !firstName || !lastName || !username || !yearLevel) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // Create the user in the User collection
     const user = await User.create({
       email,
       password: hashedPassword,
-      username, // Add username field here
+      isVerified: false,
+      verificationToken,
     });
 
-    // Create the user profile in the UserProfile collection
-    const userProfile = await UserProfile.create({
+    await UserProfile.create({
       userId: user._id,
       firstName,
       lastName,
@@ -63,10 +56,24 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
       following,
     });
 
-    console.log('UserProfile created:', userProfile);
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    // Respond with success
-    res.status(201).json({ message: 'User registered successfully', data: { user, userProfile } });
+    const verificationLink = `${process.env.BASE_URL}/api/verify-email?token=${verificationToken}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Verify Your Email',
+      text: `Click the link to verify your email: ${verificationLink}`,
+    });
+
+    res.status(201).json({ message: 'User registered successfully. Please verify your email.' });
   } catch (error) {
     console.error('Error registering user:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -20,12 +20,15 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to log in');
+        if (data.message === 'Email not verified') {
+          return setError('Please verify your email before logging in.');
+        }
+        throw new Error(data.error || 'Failed to log in');
       }
 
-      // If login is successful, redirect to profile
       router.push('/profile');
     } catch (err: any) {
       console.error('Login error:', err.message);
