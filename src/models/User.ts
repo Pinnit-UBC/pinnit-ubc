@@ -13,8 +13,10 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
-  verificationToken: { type: String },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Date },
 });
+
 
 // Define the user model
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);

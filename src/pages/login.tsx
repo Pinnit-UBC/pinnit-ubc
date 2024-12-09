@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 const Login = () => {
@@ -7,12 +7,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
-
-  useEffect(() => {
-    if (router.query.verified === 'true') {
-      setSuccessMessage('Email successfully verified! You can now log in.');
-    }
-  }, [router.query]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +26,8 @@ const Login = () => {
         throw new Error(errorData.error || 'Failed to log in');
       }
 
-      // If login is successful, redirect to profile
       router.push('/profile');
     } catch (err: any) {
-      console.error('Login error:', err.message);
       setError(err.message || 'Login failed');
     }
   };
@@ -66,6 +58,7 @@ const Login = () => {
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <button type="submit">Login</button>
       </form>
+      <button onClick={() => router.push('/forgot-password')}>Forgot Password?</button>
     </div>
   );
 };
