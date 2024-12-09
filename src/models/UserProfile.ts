@@ -1,7 +1,7 @@
-import { Schema, model, models, Model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-interface IUserProfile {
-  userId: Schema.Types.ObjectId; // Reference to the User collection
+export interface IUserProfile extends Document {
+  userId: mongoose.Types.ObjectId;
   firstName: string;
   lastName: string;
   username: string;
@@ -9,19 +9,21 @@ interface IUserProfile {
   faculty: string;
   keywords: string[];
   following: string[];
+  profilePicture?: string; // Add this field
 }
 
-const userProfileSchema = new Schema<IUserProfile>({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+const UserProfileSchema = new Schema<IUserProfile>({
+  userId: { type: Schema.Types.ObjectId, required: true, unique: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   username: { type: String, required: true },
   yearLevel: { type: String, required: true },
   faculty: { type: String, required: true },
-  keywords: [{ type: String, required: true }],
-  following: [{ type: String, default: [] }],
+  keywords: { type: [String], default: [] },
+  following: { type: [String], default: [] },
+  profilePicture: { type: String, default: '' }, // Default to an empty string
 });
 
-const UserProfile: Model<IUserProfile> = models.UserProfile || model<IUserProfile>('UserProfile', userProfileSchema);
+const UserProfile = mongoose.models.UserProfile || mongoose.model<IUserProfile>('UserProfile', UserProfileSchema);
 
 export default UserProfile;
