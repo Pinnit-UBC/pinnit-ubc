@@ -15,7 +15,10 @@ interface FormData {
 }
 
 interface ClubsData {
-  [key: string]: string[];
+  [key: string]: {
+    followers: string;
+    keywords: string[];
+  };
 }
 
 const Register: React.FC = () => {
@@ -34,7 +37,7 @@ const Register: React.FC = () => {
   });
 
   const [customKeyword, setCustomKeyword] = useState<string>('');
-  const [recommendedClubs, setRecommendedClubs] = useState<[string, number][]>([]); // Club name and match score
+  const [recommendedClubs, setRecommendedClubs] = useState<[string, number, number][]>([]); // Club name, match score, follower count
   const [clubsData, setClubsData] = useState<ClubsData>({});
   const [keywords, setKeywords] = useState<string[]>([]);
 
@@ -57,7 +60,12 @@ const Register: React.FC = () => {
   // Fetch club data from the public directory
   useEffect(() => {
     fetch('/data/clubs.json')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load clubs.json: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => setClubsData(data))
       .catch((err) => console.error('Error loading clubs data:', err));
   }, []);
@@ -88,17 +96,23 @@ const Register: React.FC = () => {
   };
 
   const handleRecommendations = () => {
-    const clubScores: [string, number][] = Object.entries(clubsData).map(
-      ([club, clubKeywords]) => {
+    const clubScores: [string, number, number][] = Object.entries(clubsData).map(
+      ([club, details]) => {
         const matchCount = formData.keywords.filter((keyword) =>
-          clubKeywords.includes(keyword)
+          details.keywords.includes(keyword)
         ).length;
-        return [club, matchCount];
+        const followers = parseInt(details.followers.replace(/,/g, ''), 10) || 0;
+        return [club, matchCount, followers];
       }
     );
 
-    // Sort clubs by match count (descending)
-    const sortedClubs = clubScores.sort((a, b) => b[1] - a[1]);
+    // Sort clubs by match count (desc), then by follower count (desc)
+    const sortedClubs = clubScores.sort((a, b) => {
+      if (b[1] === a[1]) {
+        return b[2] - a[2]; // Sort by followers if match count is equal
+      }
+      return b[1] - a[1]; // Sort by match count
+    });
 
     setRecommendedClubs(sortedClubs);
   };
@@ -106,26 +120,25 @@ const Register: React.FC = () => {
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
-  
+
     try {
       const response = await fetch('/api/userRegistration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || 'Something went wrong');
         return;
       }
-  
+
       setSuccess('Signup successful! Please check your email to verify your account.');
     } catch (err) {
       setError('Error submitting the form');
     }
   };
-  
 
   const toggleFollowing = (club: string) => {
     handleToggleSelect('following', club);
@@ -272,82 +285,98 @@ const Register: React.FC = () => {
                   </button>
                 ))}
               </div>
+              <div className="mt-4">
+                <input
+                  type="text"
+                  value={customKeyword}
+                  onChange={(e) => setCustomKeyword(e.target.value)}
+                  placeholder="Add your own keyword"
+                  className="w-full p-2 border rounded"
+                />
+                <button
+                  type="button"
+                  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={handleAddKeyword}
+                >
+                  Add Keyword
+                </button>
+              </div>
             </div>
           </>
         );
-      case 4:
-        return (
-          <>
-            <h2 className="text-xl font-bold mb-4">Recommended Clubs and Organizations</h2>
-            {recommendedClubs.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {recommendedClubs.map(([club]) => (
-                  <button
-                    key={club}
-                    type="button"
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                      formData.following.includes(club)
-                        ? 'bg-green-500 text-white shadow-md'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                    onClick={() => toggleFollowing(club)}
-                  >
-                    {club}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No recommendations available.</p>
+        case 4:
+          return (
+            <>
+              <h2 className="text-xl font-bold mb-4">Recommended Clubs and Organizations</h2>
+              {recommendedClubs.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {recommendedClubs.map(([club, matchScore, followers]) => (
+                    <button
+                      key={club}
+                      type="button"
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        formData.following.includes(club)
+                          ? 'bg-green-500 text-white shadow-md'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                      onClick={() => toggleFollowing(club)}
+                    >
+                      {club} - Match: {matchScore}, Followers: {followers}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No recommendations available.</p>
+              )}
+            </>
+          );
+        default:
+          return null;
+      }
+    };
+  
+    return (
+      <div className="max-w-md mx-auto mt-8">
+        <h1 className="text-2xl font-bold mb-4">Register</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {success && <p className="text-green-500 mb-4">{success}</p>}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (step === 1 && !validatePasswords()) {
+              return;
+            }
+            if (step === 3) {
+              handleRecommendations();
+              setStep((prev) => prev + 1);
+            } else if (step === 4) {
+              handleSubmit();
+            } else {
+              setStep((prev) => prev + 1);
+            }
+          }}
+        >
+          {renderStep()}
+          <div className="flex justify-between mt-4">
+            {step > 1 && (
+              <button
+                type="button"
+                className="bg-gray-300 text-gray-700 p-2 rounded"
+                onClick={() => setStep((prev) => prev - 1)}
+              >
+                Back
+              </button>
             )}
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="max-w-md mx-auto mt-8">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (step === 1 && !validatePasswords()) {
-            return;
-          }
-          if (step === 3) {
-            handleRecommendations();
-            setStep((prev) => prev + 1);
-          } else if (step === 4) {
-            handleSubmit();
-          } else {
-            setStep((prev) => prev + 1);
-          }
-        }}
-      >
-        {renderStep()}
-        <div className="flex justify-between mt-4">
-          {step > 1 && (
             <button
-              type="button"
-              className="bg-gray-300 text-gray-700 p-2 rounded"
-              onClick={() => setStep((prev) => prev - 1)}
+              type="submit"
+              className="bg-blue-500 text-white p-2 rounded"
             >
-              Back
+              {step === 4 ? 'Register' : 'Continue'}
             </button>
-          )}
-          <button
-            type="submit"
-            className="bg-blue-500 text-white p-2 rounded"
-          >
-            {step === 4 ? 'Register' : 'Continue'}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-export default Register;
+          </div>
+        </form>
+      </div>
+    );
+  };
+  
+  export default Register;
