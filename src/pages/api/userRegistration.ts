@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import connectMongo from '@/lib/db';
+import TemporaryUser from '@/models/TemporaryUser';
 import User from '@/models/User';
 import UserProfile from '@/models/UserProfile';
 
@@ -37,6 +38,7 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       console.log('User already exists:', email);
@@ -45,27 +47,28 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
 
     console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    console.log('Creating user...');
-    const user = await User.create({
+    // Generate a secure verification token and hash it
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(verificationToken, 10);
+    console.log('Verification token generated and hashed');
+
+    console.log('Creating temporary user...');
+    const tempUser = await TemporaryUser.create({
       email,
       password: hashedPassword,
-      isVerified: false,
-      verificationToken,
+      verificationToken: hashedToken,
+      first_name,    // Use snake_case
+      last_name,
+      username,
+      year_level,
+      faculty,
+      keywords: keywords || [],
+      following: following || [],
+      profile_picture: null, // Default to null
     });
 
-    console.log('Creating user profile...');
-    await UserProfile.create({
-      userId: user._id,
-      firstName: first_name,
-      lastName: last_name,
-      username,
-      yearLevel: year_level,
-      faculty,
-      keywords,
-      following,
-    });
+    console.log('Temporary user created:', tempUser);
 
     console.log('Preparing to send verification email...');
     const transporter = nodemailer.createTransport({
@@ -86,7 +89,7 @@ export default async function userRegistration(req: NextApiRequest, res: NextApi
       text: `Click the link to verify your email: ${verificationLink}`,
     });
 
-    console.log('User registered successfully!');
+    console.log('Verification email sent successfully!');
     res.status(201).json({ message: 'User registered successfully. Please verify your email.' });
   } catch (error) {
     console.error('Error registering user:', error);

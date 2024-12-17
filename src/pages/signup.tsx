@@ -17,12 +17,15 @@ const Register: React.FC = () => {
     faculty: '',
     keywords: [],
     following: [],
+    profile_picture: null,
   });
   const [customKeyword, setCustomKeyword] = useState<string>('');
   const [categories, setCategories] = useState<Record<string, string[]>>({});
   const [recommendedClubs, setRecommendedClubs] = useState<[string, number, number, string][]>([]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent duplicate submissions
 
   // Fetch categories for Step 3
   useEffect(() => {
@@ -43,8 +46,6 @@ const Register: React.FC = () => {
     fetch('/api/getAllClubs')
       .then((res) => res.json())
       .then((data) => {
-        console.log('Fetched clubs:', data);
-
         if (!Array.isArray(data)) {
           console.error('API did not return an array:', data);
           setRecommendedClubs([]);
@@ -57,7 +58,7 @@ const Register: React.FC = () => {
             .filter((keyword) =>
               [club.keywords, club.keywords_1, club.keywords_2]
                 .flat()
-                .filter((k: string | null | undefined) => typeof k === 'string') // Ensure valid strings
+                .filter((k: string | null | undefined) => typeof k === 'string')
                 .map((k: string) => k.toLowerCase())
                 .includes(keyword)
             ).length;
@@ -67,15 +68,9 @@ const Register: React.FC = () => {
         });
 
         const sortedClubs = clubs
-          .filter(([_, matchCount]) => matchCount > 0) // Only include clubs with matches
-          .sort((a, b) => {
-            if (b[1] === a[1]) {
-              return b[2] - a[2]; // Sort by followers if match count is equal
-            }
-            return b[1] - a[1]; // Sort by match count
-          });
+          .filter(([_, matchCount]) => matchCount > 0)
+          .sort((a, b) => (b[1] === a[1] ? b[2] - a[2] : b[1] - a[1]));
 
-        console.log('Sorted recommended clubs:', sortedClubs);
         setRecommendedClubs(sortedClubs);
       })
       .catch((err) => {
@@ -83,6 +78,21 @@ const Register: React.FC = () => {
         setRecommendedClubs([]);
       });
   }, [formData.keywords]);
+
+  const handleFileUpload = (file: File | null) => {
+    if (!file) {
+      setPreviewImage(null);
+      setFormData((prev) => ({ ...prev, profile_picture: null }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setPreviewImage(reader.result as string);
+      setFormData((prev) => ({ ...prev, profile_picture: reader.result }));
+    };
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -98,9 +108,13 @@ const Register: React.FC = () => {
     }));
   };
 
+  // Final submission: Trigger email verification
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
     setError('');
     setSuccess('');
+    setIsSubmitting(true);
 
     try {
       console.log('Submitting form data:', formData);
@@ -124,7 +138,13 @@ const Register: React.FC = () => {
     } catch (err) {
       console.error('Error submitting the form:', err);
       setError('Error submitting the form');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleNextStep = () => {
+    setStep((prev) => prev + 1);
   };
 
   const renderStep = () => {
@@ -132,7 +152,14 @@ const Register: React.FC = () => {
       case 1:
         return <Step1 formData={formData} handleChange={handleChange} />;
       case 2:
-        return <Step2 formData={formData} handleChange={handleChange} />;
+        return (
+          <Step2
+            formData={formData}
+            handleChange={handleChange}
+            handleFileUpload={handleFileUpload}
+            previewImage={previewImage}
+          />
+        );
       case 3:
         return (
           <Step3
@@ -182,7 +209,7 @@ const Register: React.FC = () => {
         onSubmit={(e) => {
           e.preventDefault();
           if (step < 4) {
-            setStep((prev) => prev + 1);
+            handleNextStep();
           } else {
             handleSubmit();
           }
@@ -202,6 +229,7 @@ const Register: React.FC = () => {
           <button
             type="submit"
             className="bg-blue-500 text-white p-2 rounded"
+            disabled={isSubmitting}
           >
             {step === 4 ? 'Register' : 'Continue'}
           </button>

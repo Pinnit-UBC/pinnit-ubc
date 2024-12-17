@@ -1,52 +1,73 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
-import User, { IUser } from '@/models/User';
-
-// Define a type for the decoded JWT payload
-interface JwtPayload {
-  userId: string;
-}
+import connectMongo from '@/lib/db';
+import TemporaryUser from '@/models/TemporaryUser';
+import User from '@/models/User';
+import UserProfile from '@/models/UserProfile';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).send('Method not allowed');
-  }
-
-  const { token } = req.query;
-
-  // Ensure token exists
-  if (!token || typeof token !== 'string') {
-    return res.status(400).send('Token is required');
-  }
-
-  // Ensure JWT_SECRET is defined
-  if (!process.env.JWT_SECRET) {
-    return res.status(500).send('JWT_SECRET is not defined in the environment variables');
-  }
+  console.log('API Endpoint Hit: /api/verify-email');
+  console.log('Request Method:', req.method);
 
   try {
-    // Decode the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+    await connectMongo();
+    console.log('Connected to MongoDB');
 
-    // Find the user by ID and type it as IUser
-    const user = await User.findById(decoded.userId) as IUser;
+    const { token } = req.query;
 
-    if (!user) {
-      return res.status(404).send('User not found');
+    if (!token) {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
     }
 
-    // Check if the email is already verified
-    if (user.isVerified) {
-      return res.status(400).send('Email already verified');
+    // Find the temporary user by token
+    const tempUser = await TemporaryUser.findOne({ verificationToken: token });
+
+    if (!tempUser) {
+      return res.status(404).json({ message: 'Invalid or expired verification token' });
     }
 
-    // Verify the user's email
-    user.isVerified = true;
-    await user.save();
+    const existingUser = await User.findOne({ email: tempUser.email });
 
-    return res.status(200).send('Email verified successfully');
+    // If the user already exists, update their isVerified status
+    if (existingUser) {
+      if (existingUser.isVerified) {
+        return res.status(400).json({ message: 'Email already verified' });
+      }
+
+      existingUser.isVerified = true;
+      await existingUser.save();
+
+      // Clean up temporary user
+      await TemporaryUser.deleteOne({ email: tempUser.email });
+
+      return res.status(200).json({ message: 'Email verified successfully' });
+    }
+
+    // If user doesn't exist, create a new user and profile
+    const newUser = await User.create({
+      email: tempUser.email,
+      password: tempUser.password, // Should already be hashed
+      isVerified: true,
+    });
+
+    await UserProfile.create({
+      userId: newUser._id,
+      firstName: tempUser.first_name,   // Map to camelCase
+      lastName: tempUser.last_name,
+      username: tempUser.username,
+      yearLevel: tempUser.year_level,
+      faculty: tempUser.faculty,
+      keywords: tempUser.keywords,
+      following: tempUser.following,
+      profilePicture: tempUser.profile_picture,
+    });
+    
+
+    // Clean up temporary user
+    await TemporaryUser.deleteOne({ email: tempUser.email });
+
+    return res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
-    console.error('Verification error:', error);
-    return res.status(400).send('Invalid or expired token');
+    console.error('Error in email verification endpoint:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }

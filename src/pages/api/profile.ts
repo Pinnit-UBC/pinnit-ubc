@@ -16,6 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const sessionToken = req.cookies.sessionToken;
 
   if (!sessionToken) {
+    console.error('Unauthorized request: No session token found');
     return res.status(401).json({ message: 'Unauthorized. No session token found.' });
   }
 
@@ -46,7 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       return res.status(200).json(response);
-    } else if (req.method === 'PUT') {
+    }
+
+    if (req.method === 'PUT') {
       const { firstName, lastName, email, ...updateData } = req.body;
 
       // Update UserProfile fields
@@ -74,52 +77,68 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       return res.status(200).json(userProfileUpdate);
-    } else if (req.method === 'POST') {
+    }
+
+    if (req.method === 'POST') {
       // Handle profile picture upload
       const { file } = req.body;
 
       if (!file) {
+        console.error('No file uploaded');
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      console.log('File upload initiated for userId:', userId);
+      try {
+        console.log('File upload initiated:', file);
 
-      const buffer = Buffer.from(file.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-      const fileType = file.split(';')[0].split('/')[1];
-      const fileName = `profilepictures/${userId}.${fileType}`;
+        // Decode Base64 and prepare for upload
+        const buffer = Buffer.from(file.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+        const fileTypeMatch = file.match(/^data:image\/(\w+);base64,/);
+        const fileType = fileTypeMatch ? fileTypeMatch[1] : 'jpg';
+        const fileName = `profilepictures/${userId}.${fileType}`;
 
-      const uploadResult = await s3
-        .upload({
-          Bucket: process.env.AWS_S3_BUCKET!,
-          Key: fileName,
-          Body: buffer,
-          ContentType: `image/${fileType}`,
-        })
-        .promise();
+        console.log('Uploading file to S3:', fileName);
 
-      const cloudfrontUrl = `https://${process.env.CLOUDFRONT_URL}/${fileName}`;
-      console.log('Image uploaded to CloudFront URL:', cloudfrontUrl);
+        const uploadResult = await s3
+          .upload({
+            Bucket: process.env.AWS_S3_BUCKET!,
+            Key: fileName,
+            Body: buffer,
+            ContentType: `image/${fileType}`,
+            ACL: 'public-read',
+          })
+          .promise();
 
-      const updatedProfile = await UserProfile.findOneAndUpdate(
-        { userId },
-        { $set: { profilePicture: cloudfrontUrl } },
-        { new: true }
-      );
+        console.log('S3 Upload Result:', uploadResult);
 
-      if (!updatedProfile) {
-        console.error('Failed to update profile picture in MongoDB. UserId:', userId);
-        return res.status(404).json({ message: 'User profile not found' });
+        const cloudfrontUrl = `https://${process.env.CLOUDFRONT_URL}/${fileName}`;
+        console.log('CloudFront URL:', cloudfrontUrl);
+
+        const updatedProfile = await UserProfile.findOneAndUpdate(
+          { userId },
+          { $set: { profilePicture: cloudfrontUrl } },
+          { new: true }
+        );
+
+        if (!updatedProfile) {
+          console.error('Failed to update profile in MongoDB.');
+          return res.status(404).json({ message: 'User profile not found' });
+        }
+
+        console.log('Profile successfully updated:', updatedProfile);
+
+        return res.status(200).json({
+          message: 'Profile picture updated successfully',
+          profilePicture: cloudfrontUrl,
+        });
+      } catch (err) {
+        console.error('Error uploading file:', err);
+        return res.status(500).json({ message: 'Internal server error during file upload' });
       }
-
-      console.log('Successfully updated profilePicture in MongoDB:', updatedProfile.profilePicture);
-
-      return res.status(200).json({
-        message: 'Profile picture updated successfully',
-        profilePicture: cloudfrontUrl,
-      });
-    } else {
-      return res.status(405).json({ message: 'Method not allowed' });
     }
+
+    // Default response for unsupported methods
+    return res.status(405).json({ message: 'Method not allowed' });
   } catch (error) {
     console.error('Error in profile API:', error);
     return res.status(500).json({ message: 'Internal server error' });

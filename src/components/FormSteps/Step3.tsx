@@ -23,13 +23,16 @@ const Step3: React.FC<Step3Props> = ({
     setExpandedCategory(expandedCategory === category ? null : category);
   };
 
+  // Filter categories to include only up to column H
+  const filteredCategories = Object.entries(categories).slice(0, 8);
+
   return (
     <>
       <div className="mb-4">
         <label className="block text-gray-700">Select your interests and hobbies</label>
         <div className="mt-4">
-          {Object.keys(categories).length > 0 ? ( // Ensure categories are loaded
-            Object.entries(categories).map(([category, keywords]) => (
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map(([category, keywords]) => (
               <div key={category} className="mb-4">
                 <button
                   type="button"
@@ -40,7 +43,7 @@ const Step3: React.FC<Step3Props> = ({
                 </button>
                 {expandedCategory === category && (
                   <div className="mt-2 ml-4 flex flex-wrap gap-2">
-                    {Array.isArray(keywords) && keywords.length > 0 ? (
+                    {Array.isArray(keywords) ? (
                       keywords.map((keyword) => (
                         <button
                           type="button"
@@ -56,7 +59,7 @@ const Step3: React.FC<Step3Props> = ({
                         </button>
                       ))
                     ) : (
-                      <p className="text-red-500">Invalid or empty data for keywords</p>
+                      <p className="text-red-500">Invalid data format for keywords</p>
                     )}
                   </div>
                 )}

@@ -3,9 +3,11 @@ import React from 'react';
 interface Step2Props {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleFileUpload: (file: File | null) => void;
+  previewImage: string | null;
 }
 
-const Step2: React.FC<Step2Props> = ({ formData, handleChange }) => {
+const Step2: React.FC<Step2Props> = ({ formData, handleChange, handleFileUpload, previewImage }) => {
   return (
     <>
       <div className="mb-4">
@@ -51,6 +53,24 @@ const Step2: React.FC<Step2Props> = ({ formData, handleChange }) => {
           <option value="Commerce">Commerce</option>
           <option value="Other">Other</option>
         </select>
+      </div>
+      <div className="mb-4">
+        <label className="block text-gray-700">Upload Profile Picture</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileUpload(e.target.files ? e.target.files[0] : null)}
+          className="w-full p-2 border rounded"
+        />
+        {previewImage && (
+          <div className="mt-4">
+            <img
+              src={previewImage}
+              alt="Profile Preview"
+              className="h-20 w-20 rounded-full object-cover"
+            />
+          </div>
+        )}
       </div>
     </>
   );
