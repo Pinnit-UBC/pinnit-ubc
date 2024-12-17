@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Connect to MongoDB
     await connectMongo();
 
+    // Handle GET Request
     if (req.method === 'GET') {
       const userProfile = await UserProfile.findOne({ userId });
 
@@ -41,46 +42,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: 'User not found' });
       }
 
+      // Fallback profile picture
+      const profilePictureUrl = userProfile.profilePicture || '/default-profile.png';
+      console.log('Profile Picture URL:', profilePictureUrl); // Debugging URL
+
       const response = {
         ...userProfile.toObject(),
         email: user.email,
+        profilePicture: profilePictureUrl,
       };
 
       return res.status(200).json(response);
     }
 
-    if (req.method === 'PUT') {
-      const { firstName, lastName, email, ...updateData } = req.body;
-
-      // Update UserProfile fields
-      const userProfileUpdate = await UserProfile.findOneAndUpdate(
-        { userId },
-        { $set: { ...updateData, firstName, lastName } },
-        { new: true }
-      );
-
-      // Update email in User collection
-      if (email) {
-        const userUpdate = await User.findByIdAndUpdate(
-          userId,
-          { $set: { email } },
-          { new: true }
-        );
-
-        if (!userUpdate) {
-          return res.status(404).json({ message: 'Failed to update email in user collection.' });
-        }
-      }
-
-      if (!userProfileUpdate) {
-        return res.status(404).json({ message: 'User profile not found.' });
-      }
-
-      return res.status(200).json(userProfileUpdate);
-    }
-
+    // Handle POST Request (File Upload)
     if (req.method === 'POST') {
-      // Handle profile picture upload
       const { file } = req.body;
 
       if (!file) {
@@ -105,15 +81,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Key: fileName,
             Body: buffer,
             ContentType: `image/${fileType}`,
-            ACL: 'public-read',
           })
           .promise();
 
-        console.log('S3 Upload Result:', uploadResult);
+        // Generate the file URL (use CloudFront if available)
+        const cloudfrontUrl = process.env.CLOUDFRONT_URL
+          ? `https://${process.env.CLOUDFRONT_URL}/${fileName}`
+          : uploadResult.Location;
 
-        const cloudfrontUrl = `https://${process.env.CLOUDFRONT_URL}/${fileName}`;
-        console.log('CloudFront URL:', cloudfrontUrl);
+        console.log('File URL:', cloudfrontUrl);
 
+        // Update UserProfile with new picture URL
         const updatedProfile = await UserProfile.findOneAndUpdate(
           { userId },
           { $set: { profilePicture: cloudfrontUrl } },
