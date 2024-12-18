@@ -30,8 +30,8 @@ const DatePicker: React.FC<DatePickerProps> = ({setDateSearched}) => {
     return (
         <div className='relative w-[25%]'>
             <label
-                htmlFor="date-input"
-                className="absolute flex items-center top-0 left-0 bg-white w-3/4 h-full border border-r-0 text-sm px-3 rounded-md font-inter">
+                htmlFor="date-search-field"
+                className="absolute flex items-center top-1 left-1 bg-white w-3/4 h-[31px] text-sm px-2 rounded-md font-inter">
                 {(searchDate !== "") ? searchDate : "All Dates"}
             </label>
             <input
@@ -39,7 +39,7 @@ const DatePicker: React.FC<DatePickerProps> = ({setDateSearched}) => {
                 type='date'
                 name="eventDate"
                 onChange={(e) => handleSearchDateChange(e)}
-                className="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
+                className="w-full h-[42px] bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-200 ease shadow-sm focus:outline-none focus:border-slate-400 hover:border-slate-300 focus:shadow"
             />
         </div>
     )
