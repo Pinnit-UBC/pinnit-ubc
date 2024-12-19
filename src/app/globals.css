@@ -19,3 +19,20 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff; /* Force white background even in dark mode */
+    --foreground: #171717; /* Default text color */
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.hamburger-menu-item{
+  @apply flex items-center text-lg font-black p-6 justify-center text-center border-b border-b-[#555555];
+}
