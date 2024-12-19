@@ -2,11 +2,11 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
 
 interface DatePickerProps {
-    setDateSearched: Dispatch<SetStateAction<String>>
+    setDateSearched: Dispatch<SetStateAction<string>>
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({setDateSearched}) => {
-    const [searchDate, setSearchDate] = useState<String>("")
+    const [searchDate, setSearchDate] = useState<string>("")
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     const monthsOfYear = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
 

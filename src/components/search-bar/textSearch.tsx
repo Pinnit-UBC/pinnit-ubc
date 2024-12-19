@@ -2,8 +2,8 @@
 import React, { Dispatch, SetStateAction } from 'react'
 
 interface TextSearchedProps {
-  setTextSearched: Dispatch<SetStateAction<String>>
-  handleSearch: Dispatch<SetStateAction<String>>
+  setTextSearched: Dispatch<SetStateAction<string>>;
+  handleSearch: () => void;
 }
 
 const TextSearch: React.FC<TextSearchedProps> = ({setTextSearched, handleSearch}) => {

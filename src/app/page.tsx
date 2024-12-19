@@ -1,5 +1,5 @@
-import HomeHeader from "./home/homeHeader";
-import { SearchBar } from "./home/searchBar";
+import HomeHeader from "@/components/search-bar/homeHeader";
+import SearchBar from "@/components/search-bar/searchBar";
 
 export default function Home() {
   return (

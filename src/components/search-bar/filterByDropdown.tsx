@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 interface FilterByDropdownProps {
-  setFilterBy: Dispatch<SetStateAction<String>>
+  setFilterBy: Dispatch<SetStateAction<string>>
 }
 
 const FilterByDropdown: React.FC<FilterByDropdownProps> = ({setFilterBy}) =>{

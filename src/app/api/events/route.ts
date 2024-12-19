@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { NextApiRequest } from "next";
 import PinnitEvent from "../../models/pinnitEvent";
 import pinnitDBConnection from '../../utils/db';
 
@@ -28,13 +27,13 @@ export async function POST(req: Request) {
   } catch (err) {
     return NextResponse.json(
       {
-        message: "Cannot add Event"
+        message: err
       }
     )
   }
 }
 
-export async function GET(req: NextRequest, { params }: any) {
+export async function GET(req: NextRequest) {
   try {
     const filterBy = req.nextUrl.searchParams.get("filterBy") as string;
     const date = req.nextUrl.searchParams.get("date") as string;
