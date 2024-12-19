@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import PinnitEvent from "../../../lib/models/Event";
+import EventModel from "../../../lib/models/Event";
 import connectDB from "../../../lib/db";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
     const JSONPinnitEvent = await req.json();
-    const pinnitEventToAdd = new PinnitEvent(JSONPinnitEvent);
+    const pinnitEventToAdd = new EventModel(JSONPinnitEvent);
     console.log(pinnitEventToAdd);
 
     pinnitEventToAdd.eventDate = new Date(pinnitEventToAdd.eventDate);
