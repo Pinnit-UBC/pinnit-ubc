@@ -22,18 +22,14 @@
     <img src="/src/app/icon.png" alt="Logo" width="80" height="80">
   </a>
 
-<h2 align="center">Pinnit</h2>
+<h1 align="center">Pinnit</h1>
 
   <p align="center">
      Pinnit is a platform designed to help students stay informed about various events happening across different clubs and organizations at the University of British Columbia (UBC).
     <br />
 </div>
 
-<!-- ABOUT THE PROJECT -->
-
-## About The Project
-
-### Built With
+## Built With
 
 - [![Next.js][Next.js]][Next-url]
 - [![React][React.js]][React-url]
@@ -45,7 +41,7 @@
 
 <!-- GETTING STARTED -->
 
-### Getting Started
+## Getting Started
 
 ### Prerequisites
 
