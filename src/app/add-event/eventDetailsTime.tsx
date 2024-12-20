@@ -11,8 +11,8 @@ const EventDetailsTime: React.FC<eventDetailsTimeProps> = ({ addEventsFormData }
     
     useEffect(() => {
         addEventsFormData.append("eventDate", todayFormatedDate)
-        addEventsFormData.append("eventStartTime", "5:00")
-        addEventsFormData.append("eventEndTime", "9:00")
+        addEventsFormData.append("eventStartTime", "17:00")
+        addEventsFormData.append("eventEndTime", "21:00")
     }, [addEventsFormData])
     
     const updateAddEventsFormData = (event: React.ChangeEvent<HTMLInputElement>) => {
