@@ -27,7 +27,7 @@ export default function SearchBar() {
   }
 
   return (
-    <div className='border border-2 border-red-500 py-10 px-40 flex gap-3'>
+    <div className='my-20 px-40 flex gap-3'>
       <FilterByDropdown setFilterBy={setFilterBy} />
       <DatePicker setDateSearched={setDateSearched} />
       <TextSearch setTextSearched={setTextSearched} handleSearch={handleSearching} />
