@@ -17,7 +17,8 @@ export default function SearchBar() {
       })
 
       const resJSON = await response.json()
-      console.log(resJSON.searchedEvents)
+      localStorage.setItem('searchedResults', JSON.stringify(resJSON))
+      window.location.href = `./search?${textSearched}`
     } catch (err) {
       alert("err")
       console.log(err)
@@ -31,5 +32,6 @@ export default function SearchBar() {
       <DatePicker setDateSearched={setDateSearched} />
       <TextSearch setTextSearched={setTextSearched} handleSearch={handleSearching} />
     </div>
+
   )
 }

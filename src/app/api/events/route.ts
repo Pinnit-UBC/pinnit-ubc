@@ -39,8 +39,6 @@ export async function GET(req: NextRequest) {
     const date = req.nextUrl.searchParams.get("date") as string;
     const textSearch = req.nextUrl.searchParams.get("textSearch") as string;
 
-    console.log(filterBy, date, textSearch)
-
     let searchQueryDate: Date;
     if (date != "") {
       searchQueryDate = new Date(date.substring(0, 10))
@@ -56,8 +54,7 @@ export async function GET(req: NextRequest) {
         eventDate: { $gte: searchQueryDate }
       }
     )
-
-    console.log(seachedPinnitEvents)
+    
     return NextResponse.json(
       {
         searchedEvents: seachedPinnitEvents
