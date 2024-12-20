@@ -16,6 +16,6 @@ const EventSchema = new Schema({
   eventImageString: String,
 });
 
-const Event = models.events || model("events", EventSchema);
+const EventModel = models.events || model("events", EventSchema);
 
-export default Event;
+export default EventModel;
