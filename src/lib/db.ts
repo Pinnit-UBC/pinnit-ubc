@@ -1,14 +1,27 @@
 import mongoose from "mongoose";
 
-const URI = process.env.MONGO_URI;
+const connectMongo = async () => {
+  if (mongoose.connection.readyState === 1) {
+    console.log("Using existing database connection");
+    return;
+  }
 
-const connectDB = async () => {
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+  if (!uri) {
+    throw new Error("MongoDB connection URI is not defined.");
+  }
+
+  console.log("Connecting to MongoDB...");
+  console.log("MongoDB URI:", uri); // Debugging
+
   try {
-    await mongoose.connect(URI!);
-    console.log("Connected to pinnitDb");
-  } catch (err) {
-    console.log("Can't connect to pinnitdB", err);
+    await mongoose.connect(uri);
+    console.log("MongoDB connected successfully!");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    throw new Error("Failed to connect to MongoDB");
   }
 };
 
-export default connectDB;
+export default connectMongo;
